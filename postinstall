@@ -1,0 +1,25 @@
+#!/bin/bash
+/Library/Management/Adobe/Adobe\ Creative\ Cloud\ Cleaner\ Tool --removeAll=ALL
+
+/usr/bin/mdfind -onlyin /Applications/Utilities/Adobe\ Application\ Manager/ -name adobe > /Library/Management/adobecrumbs.txt
+/usr/bin/mdfind -onlyin /Library/ScriptingAdditions/ -name adobe >>  /Library/Management/adobecrumbs.txt
+/usr/bin/mdfind -onlyin /Library/Application\ Support/Adobe/ -name adobe >> /Library/Management/adobecrumbs.txt
+/usr/bin/mdfind -onlyin /Library/LaunchDaemons/ -name adobe >> /Library/Management/adobeld.txt
+/usr/bin/mdfind -onlyin /Applications/Utilities/ -name adobe >> /Library/Management/adobecrumbs.txt
+/usr/bin/mdfind -onlyin /var/db/receipts -name adobe >> /Library/Management/adobecrumbs.txt
+
+sudo /usr/sbin/pkgutil com.adobe.*
+
+while read line; do
+  sudo /bin/launchctl unload "$line"
+done < /Library/Management/adobeld.txt
+
+while read line; do
+  sudo /bin/rm -rf "$line"
+done < /Library/Management/adobecrumbs.txt
+
+sudo /bin/rm -rf /Applications/Adobe*
+sudo /bin/rm -rf /Applications/DPS\ App\ Builder*
+
+sudo /bin/rm -rf /Library/Management/adobecrumbs.txt
+sudo /bin/rm -rf /Library/Management/adobeld.txt
