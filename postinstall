@@ -1,6 +1,9 @@
 #!/bin/bash
+
+# Use Adobe's commandline uninstall
 /Library/Management/Adobe/Adobe\ Creative\ Cloud\ Cleaner\ Tool --removeAll=ALL
 
+# Build list of leftover files
 /usr/bin/mdfind -onlyin /Applications/Utilities/Adobe\ Application\ Manager/ -name adobe > /Library/Management/adobecrumbs.txt
 /usr/bin/mdfind -onlyin /Library/ScriptingAdditions/ -name adobe >>  /Library/Management/adobecrumbs.txt
 /usr/bin/mdfind -onlyin /Library/Application\ Support/Adobe/ -name adobe >> /Library/Management/adobecrumbs.txt
@@ -8,18 +11,24 @@
 /usr/bin/mdfind -onlyin /Applications/Utilities/ -name adobe >> /Library/Management/adobecrumbs.txt
 /usr/bin/mdfind -onlyin /var/db/receipts -name adobe >> /Library/Management/adobecrumbs.txt
 
-sudo /usr/sbin/pkgutil com.adobe.*
+# Forget all Adobe receipts
+/usr/sbin/pkgutil --forget com.adobe.*
 
+# Unload all LaunchDaemons
 while read line; do
-  sudo /bin/launchctl unload "$line"
+  /bin/launchctl unload "$line"
 done < /Library/Management/adobeld.txt
 
+# Remove all files
 while read line; do
-  sudo /bin/rm -rf "$line"
+  /bin/rm -rf "$line"
 done < /Library/Management/adobecrumbs.txt
 
-sudo /bin/rm -rf /Applications/Adobe*
-sudo /bin/rm -rf /Applications/DPS\ App\ Builder*
+# Clear final dirs
+/bin/rm -rf /Applications/Adobe*
+/bin/rm -rf /Applications/DPS\ App\ Builder*
+/bin/rm -rf /Library/Application\ Support/Adobe/Uninstall
 
-sudo /bin/rm -rf /Library/Management/adobecrumbs.txt
-sudo /bin/rm -rf /Library/Management/adobeld.txt
+# House keeping
+/bin/rm -rf /Library/Management/adobecrumbs.txt
+/bin/rm -rf /Library/Management/adobeld.txt
